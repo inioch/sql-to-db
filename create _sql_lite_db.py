@@ -2,6 +2,7 @@ import sqlite3
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from tkinter import ttk
+import customtkinter as ctk
 
 
 class Application:
@@ -9,30 +10,23 @@ class Application:
         # ustawienia tkinter
         self.root = root
         self.root.title("SQL to DB Converter")
-        self.root.geometry("400x250")
-        # self.root.resizable(False, False)  
+        self.root.geometry("450x250")
+        self.root.resizable(False, False)  
+    
 
-        # style tkk
-        self.style = ttk.Style()
-        self.style.configure("TButton", font=("Arial", 12), padding=5)
-        self.style.configure("TLabel", font=("Arial", 11), padding=5)
+        ctk.set_appearance_mode("system")
+        ctk.set_default_color_theme("blue")  
 
-        # tworzenie obiektów
-        self.file_path = None
-        self.create_widgets()
+        self.create_widgets()      
 
     def create_widgets(self):
-        frame = ttk.Frame(self.root, padding=20)
-        frame.pack(expand=True)
+        ctk.CTkLabel(root, text="Loaded File: ", font=("Arial", 12, "bold")).pack(anchor="w")
 
-
-        ttk.Label(frame, text="Loaded File: ", font=("Arial", 12, "bold")).pack(anchor="w")
-
-        self.textlabel = ttk.Label(frame, text="", foreground="blue")
+        self.textlabel = ctk.CTkLabel(root, text="", text_color="blue")
         self.textlabel.pack(anchor="w", pady=(0,10))
-        ttk.Button(frame, text="Import SQL file", command=self.open_file).pack(fill="x", pady=5)
-        ttk.Button(frame, text="Change to db", command=self.convert_data).pack(fill="x", pady=5)
-        ttk.Button(frame, text="Exit", command=self.root.quit).pack(fill="x", pady=5)
+        ctk.CTkButton(root, text="Import SQL file", command=self.open_file).pack(fill="x", pady=5)
+        ctk.CTkButton(root, text="Change to db", command=self.convert_data).pack(fill="x", pady=5)
+        ctk.CTkButton(root, text="Exit", command=self.root.quit).pack(fill="x", pady=5)
 
         
     def open_file(self):
@@ -41,8 +35,7 @@ class Application:
         ) 
         if file_path:
             self.file_path = file_path
-            self.textlabel.config(text=file_path)
-            messagebox.showinfo("File selected", f"Selected file\n{file_path}")
+            self.textlabel.configure(text=file_path)
         else:
             messagebox.showinfo("File not imported", "No file selected")
 
@@ -52,9 +45,9 @@ class Application:
            return
        
         db_path = filedialog.asksaveasfilename(defaultextension=".db", filetypes=[("Database Files", "*.db")], title="Save Database as")
-    #    
-    # db_path = self.file_path.replace(".sql", ".db")
-
+        if not db_path:
+           messagebox.showwarning("Canceled", "Type name to save the database")
+           return
         try:
            conn = sqlite3.connect(db_path)
            cursor = conn.cursor()
@@ -70,6 +63,6 @@ class Application:
            messagebox.showerror("Error", f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    root = tk.Tk()
+    root = ctk.CTk()
     app = Application(root)
     root.mainloop()
